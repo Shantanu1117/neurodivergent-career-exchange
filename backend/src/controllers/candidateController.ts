@@ -1,6 +1,12 @@
 import { Request, Response } from 'express';
 import { CandidateProfile } from '../models/CandidateProfile.js';
 import { User } from '../models/User.js';
+import { Job } from '../models/Job.js';
+import { Application } from '../models/Application.js';
+import { SavedJob } from '../models/SavedJob.js';
+import { Interview } from '../models/Interview.js';
+import { Resource } from '../models/Resource.js';
+import { MatchingService } from '../services/matchingService.js';
 
 export class CandidateController {
   public static async getProfile(req: Request, res: Response): Promise<void> {
@@ -22,13 +28,15 @@ export class CandidateController {
       const updateData = req.body;
       
       // Calculate profile completion score
-      let completion = 30;
+      let completion = 25;
       if (updateData.fullName) completion += 10;
       if (updateData.headline) completion += 10;
       if (updateData.skills && updateData.skills.length >= 3) completion += 15;
       if (updateData.strengths && updateData.strengths.length >= 2) completion += 15;
       if (updateData.howIWorkBest && updateData.howIWorkBest.length > 20) completion += 10;
-      if (updateData.accommodations && updateData.accommodations.length >= 1) completion += 10;
+      if (updateData.accommodations && updateData.accommodations.length >= 1) completion += 5;
+      if (updateData.sensoryProfile) completion += 5;
+      if (updateData.accommodationPlanner) completion += 5;
       
       updateData.profileCompletion = Math.min(100, completion);
 
@@ -42,6 +50,271 @@ export class CandidateController {
     } catch (err: any) {
       console.error('updateProfile error:', err);
       res.status(500).json({ success: false, message: 'Failed to update profile.' });
+    }
+  }
+
+  public static async parseCvText(req: Request, res: Response): Promise<void> {
+    try {
+      const rawText = req.body.rawText || req.body.cvText || req.body.text || '';
+      if (!rawText || typeof rawText !== 'string' || rawText.trim().length < 10) {
+        res.status(400).json({
+          success: false,
+          message: 'Please paste or upload at least a brief summary, resume, or portfolio text.',
+        });
+        return;
+      }
+
+      const lower = rawText.toLowerCase();
+
+      const skillCatalog = [
+        'Python', 'TypeScript', 'JavaScript', 'React', 'Node.js', 'SQL', 'PostgreSQL', 'MongoDB',
+        'Selenium', 'Cypress', 'Playwright', 'Automated Testing', 'Manual QA', 'Regression Testing',
+        'API Testing', 'Postman', 'Jest', 'Bug Tracking', 'Jira', 'SIEM', 'Splunk', 'Wireshark',
+        'Network Security', 'Incident Response', 'Threat Hunting', 'Vulnerability Assessment',
+        'Linux', 'Bash', 'Docker', 'Kubernetes', 'AWS', 'Git', 'Data Analysis', 'Excel',
+        'PowerBI', 'Tableau', 'Pandas', 'Data Auditing', 'Quality Assurance', 'Figma',
+        'UI Design', 'UX Research', 'WCAG Accessibility', 'Design Systems', 'HTML/CSS',
+        'Technical Writing', 'Markdown', 'API Documentation', 'Research Methodology', 'C++', 'Rust', 'Java',
+      ];
+
+      const extractedSkills = skillCatalog.filter((skill) =>
+        lower.includes(skill.toLowerCase())
+      );
+
+      // Ensure sensible fallback skills if general terms are used
+      if (extractedSkills.length === 0) {
+        if (lower.includes('test') || lower.includes('bug') || lower.includes('qa')) {
+          extractedSkills.push('Manual QA', 'Bug Tracking', 'Regression Testing');
+        }
+        if (lower.includes('data') || lower.includes('spreadsheet') || lower.includes('report')) {
+          extractedSkills.push('Data Analysis', 'Data Auditing', 'SQL');
+        }
+        if (lower.includes('code') || lower.includes('web') || lower.includes('software')) {
+          extractedSkills.push('JavaScript', 'Git', 'API Testing');
+        }
+        if (extractedSkills.length === 0) {
+          extractedSkills.push('Technical Writing', 'Quality Assurance', 'Data Analysis');
+        }
+      }
+
+      const strengthKeywords: Array<{ label: string; triggers: string[] }> = [
+        { label: 'Attention to Detail', triggers: ['detail', 'thorough', 'accurate', 'precision', 'audit', 'test', 'qa'] },
+        { label: 'Pattern Recognition', triggers: ['pattern', 'trend', 'anomaly', 'log', 'data', 'security', 'analyze'] },
+        { label: 'Deep Focus', triggers: ['focus', 'deep', 'independent', 'research', 'complex', 'coding'] },
+        { label: 'Systematic Verification', triggers: ['systematic', 'verify', 'checklist', 'compliance', 'testing', 'process'] },
+        { label: 'Logical Thinking', triggers: ['logic', 'algorithm', 'architecture', 'debug', 'troubleshoot', 'math'] },
+        { label: 'Systematic Documentation', triggers: ['document', 'write', 'guide', 'wiki', 'manual', 'notes'] },
+        { label: 'Visual Precision', triggers: ['design', 'ui', 'ux', 'visual', 'layout', 'accessibility', 'figma'] },
+      ];
+
+      const extractedStrengths = strengthKeywords
+        .filter((item) => item.triggers.some((t) => lower.includes(t)))
+        .map((item) => item.label);
+
+      if (extractedStrengths.length < 2) {
+        extractedStrengths.push('Attention to Detail', 'Pattern Recognition', 'Systematic Verification');
+      }
+
+      const transferableRules: Array<{
+        triggers: string[];
+        sourceExperience: string;
+        mappedSkill: string;
+        category: string;
+      }> = [
+        {
+          triggers: ['academic', 'thesis', 'university', 'research', 'lab', 'study'],
+          sourceExperience: 'Academic / Independent Research',
+          mappedSkill: 'Research Methodology & Data Auditing',
+          category: 'RESEARCH_DOCUMENTATION',
+        },
+        {
+          triggers: ['game', 'modding', 'discord', 'community', 'hobby', 'open source', 'raid'],
+          sourceExperience: 'Self-Directed Technical Projects / Modding',
+          mappedSkill: 'Exploratory QA & Bug Reproduction',
+          category: 'SOFTWARE_TESTING_QA',
+        },
+        {
+          triggers: ['music', 'math', 'puzzle', 'chess', 'cryptography', 'ctf'],
+          sourceExperience: 'Analytical Pattern & Logic Problem Solving',
+          mappedSkill: 'Anomaly Detection & Algorithmic Analysis',
+          category: 'CYBERSECURITY',
+        },
+        {
+          triggers: ['retail', 'inventory', 'admin', 'operations', 'catalog', 'finance', 'spreadsheet'],
+          sourceExperience: 'Operations & Inventory Reconciliation',
+          mappedSkill: 'Data Integrity Verification & SQL Reporting',
+          category: 'DATA_ANALYSIS_AUDIT',
+        },
+      ];
+
+      const transferableSkills = transferableRules
+        .filter((r) => r.triggers.some((t) => lower.includes(t)))
+        .map(({ sourceExperience, mappedSkill, category }) => ({
+          sourceExperience,
+          mappedSkill,
+          category,
+          context: sourceExperience,
+          extractedSkill: mappedSkill,
+          evidenceNote: `Mapped from ${sourceExperience}`,
+        }));
+
+      if (transferableSkills.length === 0) {
+        transferableSkills.push({
+          sourceExperience: 'Structured Problem Solving & Self-Directed Learning',
+          mappedSkill: 'Systematic Quality Verification',
+          category: 'SOFTWARE_TESTING_QA',
+          context: 'Structured Problem Solving & Self-Directed Learning',
+          extractedSkill: 'Systematic Quality Verification',
+          evidenceNote: 'Mapped from structured self-directed project work',
+        });
+      }
+
+      const topSkills = extractedSkills.slice(0, 3).join(', ');
+      const suggestedHeadline = `Strengths-Driven Professional • ${topSkills}`;
+      const suggestedBio = `Neurodivergent-affirming professional skilled in ${extractedSkills
+        .slice(0, 5)
+        .join(', ')}. Known for ${Array.from(new Set(extractedStrengths))
+        .slice(0, 3)
+        .join(', ').toLowerCase()} and delivering high-accuracy work in structured environments.`;
+
+      const resultObj = {
+        skills: Array.from(new Set(extractedSkills)),
+        strengths: Array.from(new Set(extractedStrengths)),
+        transferableSkills,
+        suggestedHeadline,
+        suggestedBio,
+      };
+
+      res.json({
+        success: true,
+        parsed: resultObj,
+        extracted: resultObj,
+      });
+    } catch (err: any) {
+      console.error('parseCvText error:', err);
+      res.status(500).json({ success: false, message: 'Failed to parse resume text.' });
+    }
+  }
+
+  public static async getSkillGapAnalysis(req: Request, res: Response): Promise<void> {
+    try {
+      const candidate = await CandidateProfile.findOne({ userId: req.user?.userId });
+      const job = await Job.findById(req.params.jobId);
+
+      if (!job) {
+        res.status(404).json({ success: false, message: 'Job not found.' });
+        return;
+      }
+
+      if (!candidate) {
+        res.status(404).json({ success: false, message: 'Candidate profile not found.' });
+        return;
+      }
+
+      const matchResult = MatchingService.calculateMatch(candidate, job);
+      const resources = await Resource.find({ category: job.category }).limit(3).lean();
+
+      const learningBridge = matchResult.missingSkills.map((skill) => ({
+        skill,
+        estimatedHours: 6,
+        actionStep: `Complete a self-paced practical module or mini-project in ${skill} and add it to your Transferable Skills mapper.`,
+        recommendedResourceTitle:
+          resources[0]?.title || `Self-Paced ${skill} Fundamentals for Visual & Literal Thinkers`,
+      }));
+
+      const totalCore = (matchResult.matchedSkills.length + matchResult.missingSkills.length) || 1;
+      const readinessPercent = Math.round((matchResult.matchedSkills.length / totalCore) * 100);
+
+      const gapPayload = {
+        overallScore: matchResult.overallScore,
+        readinessPercent,
+        breakdown: matchResult.breakdown,
+        matchedSkills: matchResult.matchedSkills,
+        missingSkills: matchResult.missingSkills,
+        matchedCoreSkills: matchResult.matchedSkills,
+        missingCoreSkills: matchResult.missingSkills,
+        transferableMatches: matchResult.transferableMatches,
+        appliedWeights: matchResult.appliedWeights,
+        learningBridge,
+        encouragementNote:
+          matchResult.missingSkills.length === 0
+            ? 'You meet 100% of the core technical skills for this role! You can apply with high confidence.'
+            : `Neurodivergent candidates often wait for 100% skill overlap before applying—but employers on NCE welcome applicants who match core strengths and are ready to learn the remaining ${matchResult.missingSkills.length} skill(s).`,
+      };
+
+      res.json({
+        success: true,
+        analysis: gapPayload,
+        skillGap: gapPayload,
+      });
+    } catch (err: any) {
+      console.error('getSkillGapAnalysis error:', err);
+      res.status(500).json({ success: false, message: 'Failed to compute skill gap analysis.' });
+    }
+  }
+
+  public static async exportCandidateData(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const user = await User.findById(userId).select('-passwordHash').lean();
+      const profile = await CandidateProfile.findOne({ userId }).lean();
+      const applications = profile
+        ? await Application.find({ candidateId: profile._id })
+            .populate('jobId', 'title category workMode location')
+            .lean()
+        : [];
+      const savedJobs = profile
+        ? await SavedJob.find({ candidateId: profile._id })
+            .populate('jobId', 'title category location')
+            .lean()
+        : [];
+      const interviews = profile
+        ? await Interview.find({ candidateId: profile._id })
+            .populate('jobId', 'title')
+            .lean()
+        : [];
+
+      const bundle = {
+        exportedAt: new Date().toISOString(),
+        platform: 'Neurodivergent Career Exchange (NCE)',
+        dataSovereigntyStandard: 'GDPR Article 20 (Right to Data Portability)',
+        account: user,
+        candidateProfile: profile,
+        applications,
+        savedJobs,
+        interviews,
+      };
+
+      res.json({
+        success: true,
+        exportBundle: bundle,
+        exportData: bundle,
+      });
+    } catch (err: any) {
+      console.error('exportCandidateData error:', err);
+      res.status(500).json({ success: false, message: 'Failed to export candidate data.' });
+    }
+  }
+
+  public static async deleteCandidateAccount(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.userId;
+      const profile = await CandidateProfile.findOne({ userId });
+      if (profile) {
+        await Application.deleteMany({ candidateId: profile._id });
+        await SavedJob.deleteMany({ candidateId: profile._id });
+        await Interview.deleteMany({ candidateId: profile._id });
+        await CandidateProfile.deleteOne({ _id: profile._id });
+      }
+      await User.findByIdAndDelete(userId);
+
+      res.json({
+        success: true,
+        message: 'Your account and all personal profile data have been permanently deleted.',
+      });
+    } catch (err: any) {
+      console.error('deleteCandidateAccount error:', err);
+      res.status(500).json({ success: false, message: 'Failed to delete candidate account.' });
     }
   }
 
@@ -86,8 +359,12 @@ export class CandidateController {
       // Sanitize candidates who don't want accommodations public
       const sanitized = candidates.map((cand) => {
         const obj = cand.toObject();
-        if (!obj.privacySettings?.shareAccommodationsPublicly) {
-          obj.accommodations = ['[Candidate prefers to share accommodations post-match]'];
+        const stage = obj.disclosurePreferences?.accommodationsStage || 'AT_INTERVIEW';
+        if (!obj.privacySettings?.shareAccommodationsPublicly || stage === 'PRIVATE' || stage === 'POST_OFFER') {
+          obj.accommodations = ['[Candidate shares accommodations at interview/offer stage]'];
+        }
+        if (obj.accommodationPlanner) {
+          obj.accommodationPlanner.privateNotes = '[Private to candidate]';
         }
         return obj;
       });
@@ -110,6 +387,9 @@ export class CandidateController {
       const candObj = candidate.toObject();
       if (!candObj.privacySettings?.shareAccommodationsPublicly) {
         candObj.accommodations = ['[Shared directly with interviewing employers]'];
+      }
+      if (candObj.accommodationPlanner) {
+        candObj.accommodationPlanner.privateNotes = '[Private to candidate]';
       }
 
       res.json({ success: true, candidate: candObj });

@@ -38,6 +38,40 @@ export interface CandidateProfile {
     shareAccommodationsPublicly: boolean;
     isSearchableByRecruiters: boolean;
   };
+  sensoryProfile?: {
+    auditorySensitivity?: 'LOW' | 'MODERATE' | 'HIGH';
+    visualStimulationPreference?: 'MINIMAL' | 'BALANCED' | 'HIGH';
+    socialConcurrencyTolerance?: 'ONE_ON_ONE' | 'SMALL_GROUP' | 'FLEXIBLE';
+    contextSwitchingStyle?: 'DEEP_FOCUS_BLOCKS' | 'INTERLEAVED' | 'FLEXIBLE';
+    predictabilityNeeds?: 'HIGH_ROUTINE' | 'MODERATE' | 'ADAPTIVE';
+  };
+  matchingWeights?: {
+    skills: number;
+    environment: number;
+    strengths: number;
+    experience: number;
+    accommodations: number;
+  };
+  accommodationPlanner?: {
+    applicationStage: string[];
+    interviewStage: string[];
+    onboardingStage: string[];
+    workplaceStage: string[];
+    privateNotes?: string;
+  };
+  disclosurePreferences?: {
+    shareAtStage: 'APPLICATION' | 'INTERVIEW' | 'OFFER' | 'POST_HIRE' | 'NEVER';
+    shareSensoryProfile: boolean;
+    shareStrengthsMatrix: boolean;
+    shareAdjustmentPassport: boolean;
+  };
+  transferableSkills?: Array<{
+    context: string;
+    extractedSkill: string;
+    evidenceNote?: string;
+  }>;
+  learningMilestones?: string[];
+  onboardingCompleted?: boolean;
   education?: Array<{
     institution: string;
     degree: string;
@@ -97,8 +131,11 @@ export interface Job {
   title: string;
   category: JobCategory;
   description: string;
+  plainLanguageSummary?: string;
   responsibilities: string[];
   requirements: string[];
+  essentialRequirements?: string[];
+  preferredRequirements?: string[];
   requiredSkills: string[];
   preferredSkills: string[];
   matchedStrengths: string[];
@@ -118,6 +155,23 @@ export interface Job {
     duration: string;
     format: string;
   }>;
+  workSampleTask?: {
+    enabled: boolean;
+    title: string;
+    instructions: string;
+    estimatedMinutes: number;
+  };
+  sensoryEnvironment?: {
+    noiseLevel: 'QUIET' | 'MODERATE' | 'DYNAMIC';
+    meetingLoad: 'MINIMAL' | 'MODERATE' | 'HIGH';
+    communicationStyle: 'ASYNC_FIRST' | 'BALANCED' | 'SYNC_HEAVY';
+    teamAutonomy: 'HIGH_STRUCTURE' | 'BALANCED' | 'SELF_DIRECTED';
+  };
+  inclusivityAnalysis?: {
+    score: number;
+    warnings: string[];
+    positives: string[];
+  };
   status: 'PUBLISHED' | 'DRAFT' | 'CLOSED';
   deadline?: string;
   applicantCount?: number;
@@ -131,8 +185,12 @@ export interface Job {
     accommodationsMatch: number;
   };
   matchReasons?: string[];
+  matchedSkills?: string[];
+  missingSkills?: string[];
+  transferableMatches?: string[];
   isSaved?: boolean;
   hasApplied?: boolean;
+  userApplication?: Application;
 }
 
 export type ApplicationStatus =
@@ -160,6 +218,26 @@ export interface Application {
   };
   requestedAccommodations: string[];
   candidateNote?: string;
+  submissionType?: 'STANDARD' | 'WORK_SAMPLE' | 'ASYNC_WALKTHROUGH';
+  workSampleSubmission?: {
+    taskPrompt?: string;
+    responseText?: string;
+    artifactUrl?: string;
+    submittedAt?: string;
+  };
+  preferredInterviewFormat?: 'VIDEO' | 'WRITTEN_ASYNC' | 'TAKE_HOME_TASK' | 'PHONE' | 'FLEXIBLE';
+  feedbackRequested?: boolean;
+  structuredFeedback?: {
+    strengthsHighlighted: string[];
+    growthAreas: string[];
+    encouragementNote: string;
+    sharedAt: string;
+  };
+  accommodationChecklist?: Array<{
+    item: string;
+    status: 'PENDING' | 'APPROVED' | 'COMPLETED';
+    updatedAt?: string;
+  }>;
   employerNotes?: Array<{
     authorName: string;
     note: string;
@@ -183,6 +261,8 @@ export interface Interview {
   title: string;
   scheduledAt: string;
   durationMinutes: number;
+  timeZone?: string;
+  sensoryBreakMinutes?: number;
   meetingType: 'VIDEO' | 'PHONE' | 'WRITTEN_TASK' | 'ONSITE';
   meetingUrl: string;
   agenda: string;
@@ -193,6 +273,14 @@ export interface Interview {
   }>;
   confirmedAccommodations: string[];
   questionsInAdvance: string[];
+  evaluationRubric?: {
+    technicalExecution: number;
+    problemSolvingClarity: number;
+    asyncCommunication: number;
+    taskCompletionQuality: number;
+    evaluatorSummary: string;
+    completedAt?: string;
+  };
   status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
   notes?: string;
 }

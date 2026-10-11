@@ -7,5 +7,6 @@ const router = Router();
 router.get('/profile', requireAuth, requireRole('EMPLOYER'), EmployerController.getProfile);
 router.put('/profile', requireAuth, requireRole('EMPLOYER'), EmployerController.updateProfile);
 router.get('/dashboard/stats', requireAuth, requireRole('EMPLOYER'), EmployerController.getDashboardStats);
+router.get('/dashboard-stats', requireAuth, requireRole('EMPLOYER'), EmployerController.getDashboardStats);
 
 export default router;

@@ -9,6 +9,7 @@ import { AdminLayout } from './layouts/AdminLayout.js';
 
 // Route Protection
 import { ProtectedRoute } from './components/common/ProtectedRoute.js';
+import { GsapMotionController } from './components/common/GsapMotionController.js';
 
 // Public Pages
 import { LandingPage } from './pages/public/LandingPage.js';
@@ -60,7 +61,9 @@ import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export const App: React.FC = () => {
   return (
-    <Routes>
+    <>
+      <GsapMotionController />
+      <Routes>
       {/* Public Pages */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<LandingPage />} />
@@ -74,6 +77,9 @@ export const App: React.FC = () => {
         <Route path="/success-stories" element={<PlacedCandidatesPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/resources/:slug" element={<ResourceDetailPage />} />
+        <Route path="/assessment" element={<CandidateAssessmentPage />} />
+        <Route path="/results" element={<CandidateResultsPage />} />
+        <Route path="/assessment/results" element={<CandidateResultsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>
@@ -90,6 +96,7 @@ export const App: React.FC = () => {
         <Route index element={<CandidateDashboard />} />
         <Route path="dashboard" element={<CandidateDashboard />} />
         <Route path="assessment" element={<CandidateAssessmentPage />} />
+        <Route path="results" element={<CandidateResultsPage />} />
         <Route path="assessment/results" element={<CandidateResultsPage />} />
         <Route path="jobs" element={<CandidateJobsPage />} />
         <Route path="saved" element={<CandidateSavedJobsPage />} />
@@ -147,6 +154,7 @@ export const App: React.FC = () => {
       {/* Catch-all Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 };
 

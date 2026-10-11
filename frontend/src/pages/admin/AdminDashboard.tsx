@@ -1,49 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import { LoadingSkeleton } from '../../components/common/LoadingSkeleton.js';
+import { useToast } from '../../context/ToastContext.js';
 import {
-  Users,
-  Building2,
-  Briefcase,
-  FileCheck2,
-  Calendar,
-  Sparkles,
-  TrendingUp,
   ShieldCheck,
+  MessageSquareWarning,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
+  const { success, error } = useToast();
   const [stats, setStats] = useState<any>(null);
+  const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await api.getAdminStats();
-        if (res.success) {
-          setStats(res.stats);
-        }
-      } catch (err) {
-        console.error('Failed to load admin stats:', err);
-      } finally {
-        setLoading(false);
+  const fetchAdminData = async () => {
+    try {
+      const [statsRes, repRes] = await Promise.all([
+        api.getAdminStats(),
+        api.getAdminAccessibilityReports().catch(() => ({ success: false, reports: [] })),
+      ]);
+      if (statsRes.success) {
+        setStats(statsRes.stats);
       }
-    };
-    fetchStats();
+      if (repRes.success) {
+        setReports(repRes.reports);
+      }
+    } catch (err) {
+      console.error('Failed to load admin stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminData();
   }, []);
+
+  const handleResolveReport = async (reportId: string, nextStatus: string) => {
+    try {
+      const res = await api.updateAdminAccessibilityReport(reportId, {
+        status: nextStatus,
+        adminNote: 'Reviewed and resolved by Accessibility Operations Team.',
+      });
+      if (res.success) {
+        success(`Accessibility report marked as ${nextStatus}.`);
+        fetchAdminData();
+      }
+    } catch (err: any) {
+      error(err.message || 'Could not update accessibility report.');
+    }
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
       <div>
-        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-400">
+        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-indigo-600">
           <ShieldCheck className="w-4 h-4" />
-          <span>Platform Operations Center</span>
+          <span>Platform Operations & Accessibility Governance</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Executive Operations & Metrics
+          Executive Operations & WCAG Compliance Center
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Real-time platform activity across candidates, verified employers, jobs, and applications.
+          Real-time platform activity across candidates, verified employers, jobs, applications, and WCAG 2.2 accessibility feedback.
         </p>
       </div>
 
@@ -119,6 +139,72 @@ export const AdminDashboard: React.FC = () => {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Feature #40: In-App Accessibility Barrier Reports Triage */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-subtle space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquareWarning className="w-5 h-5 text-brand-600" />
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">
+                    WCAG 2.2 SC 3.2.6 Accessibility & Sensory Barrier Reports ({reports.length})
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Direct user feedback submitted from the global Comfort & Accessibility Drawer
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {reports.length === 0 ? (
+              <p className="text-xs text-slate-500 py-4">
+                Zero open accessibility or sensory barrier reports at this time.
+              </p>
+            ) : (
+              <div className="divide-y divide-slate-100 text-xs">
+                {reports.map((rep) => (
+                  <div
+                    key={rep._id}
+                    className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-indigo-50 text-brand-700 font-bold border border-indigo-200">
+                          {rep.category}
+                        </span>
+                        <span className="font-semibold text-slate-500">Page: {rep.pageUrl}</span>
+                        <span className="text-slate-400">
+                          • {new Date(rep.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-slate-800 font-medium">{rep.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`px-2.5 py-1 rounded-lg font-bold ${
+                          rep.status === 'RESOLVED'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border border-amber-200'
+                        }`}
+                      >
+                        {rep.status}
+                      </span>
+                      {rep.status !== 'RESOLVED' && (
+                        <button
+                          type="button"
+                          onClick={() => handleResolveReport(rep._id, 'RESOLVED')}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Mark Resolved</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}

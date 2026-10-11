@@ -28,6 +28,25 @@ export interface IJob extends Document {
   experienceLevel: 'ENTRY' | 'MID' | 'SENIOR' | 'LEAD';
   employmentType: 'FULL_TIME' | 'PART_TIME' | 'INTERNSHIP' | 'CONTRACT';
   accommodationsOffered: string[];
+  plainLanguageSummary?: string;
+  essentialRequirements?: string[];
+  preferredRequirements?: string[];
+  workSampleTask?: {
+    enabled: boolean;
+    title: string;
+    instructions: string;
+    estimatedMinutes: number;
+  };
+  sensoryEnvironment?: {
+    noiseLevel: 'QUIET' | 'MODERATE' | 'DYNAMIC';
+    lightingType: string;
+    meetingLoad: 'MINIMAL' | 'MODERATE' | 'FREQUENT';
+    communicationStyle: string;
+  };
+  inclusivityAnalysis?: {
+    score: number;
+    suggestions: string[];
+  };
   interviewProcess: Array<{
     stageNumber: number;
     title: string;
@@ -64,8 +83,11 @@ const JobSchema = new Schema<IJob>(
       required: true,
     },
     description: { type: String, required: true },
+    plainLanguageSummary: { type: String, default: '' },
     responsibilities: [{ type: String }],
     requirements: [{ type: String }],
+    essentialRequirements: [{ type: String }],
+    preferredRequirements: [{ type: String }],
     requiredSkills: [{ type: String }],
     preferredSkills: [{ type: String }],
     matchedStrengths: [{ type: String }],
@@ -90,6 +112,36 @@ const JobSchema = new Schema<IJob>(
       default: 'FULL_TIME',
     },
     accommodationsOffered: [{ type: String }],
+    workSampleTask: {
+      enabled: { type: Boolean, default: true },
+      title: {
+        type: String,
+        default: 'Practical Role Scenario (Optional Cover-Letter Alternative)',
+      },
+      instructions: {
+        type: String,
+        default: 'Instead of a traditional cover letter, you may describe how you would approach a realistic task in this role (e.g., investigating a bug, auditing a dataset, or structuring a component). Untimed and optional.',
+      },
+      estimatedMinutes: { type: Number, default: 20 },
+    },
+    sensoryEnvironment: {
+      noiseLevel: {
+        type: String,
+        enum: ['QUIET', 'MODERATE', 'DYNAMIC'],
+        default: 'QUIET',
+      },
+      lightingType: { type: String, default: 'Remote / Adjustable Natural Lighting' },
+      meetingLoad: {
+        type: String,
+        enum: ['MINIMAL', 'MODERATE', 'FREQUENT'],
+        default: 'MINIMAL',
+      },
+      communicationStyle: { type: String, default: 'Async-first written documentation + scheduled syncs with advance agenda' },
+    },
+    inclusivityAnalysis: {
+      score: { type: Number, default: 94 },
+      suggestions: [{ type: String }],
+    },
     interviewProcess: [
       {
         stageNumber: Number,

@@ -18,6 +18,22 @@ export interface IInterview extends Document {
   }>;
   confirmedAccommodations: string[];
   questionsInAdvance: string[];
+  timeZone?: string;
+  sensoryBreakMinutes?: number;
+  evaluationRubric?: {
+    technicalExecution?: number;
+    problemSolvingClarity?: number;
+    asyncCommunication?: number;
+    taskCompletionQuality?: number;
+    evaluatorSummary?: string;
+    completedAt?: Date;
+    technicalCompetency?: number;
+    problemSolvingDepth?: number;
+    environmentAlignment?: number;
+    asyncCommunicationClarity?: number;
+    strengthsObserved?: string;
+    recommendation?: 'STRONG_HIRE' | 'HIRE' | 'FOLLOW_UP' | 'PENDING';
+  };
   status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
   notes?: string;
   createdAt: Date;
@@ -68,6 +84,26 @@ const InterviewSchema = new Schema<IInterview>(
     ],
     confirmedAccommodations: [{ type: String }],
     questionsInAdvance: [{ type: String }],
+    timeZone: { type: String, default: 'America/New_York (EST/EDT)' },
+    sensoryBreakMinutes: { type: Number, default: 10 },
+    evaluationRubric: {
+      technicalExecution: { type: Number, default: 5 },
+      problemSolvingClarity: { type: Number, default: 5 },
+      asyncCommunication: { type: Number, default: 5 },
+      taskCompletionQuality: { type: Number, default: 5 },
+      evaluatorSummary: { type: String, default: '' },
+      completedAt: { type: Date },
+      technicalCompetency: { type: Number, default: 0 },
+      problemSolvingDepth: { type: Number, default: 0 },
+      environmentAlignment: { type: Number, default: 0 },
+      asyncCommunicationClarity: { type: Number, default: 0 },
+      strengthsObserved: { type: String, default: '' },
+      recommendation: {
+        type: String,
+        enum: ['STRONG_HIRE', 'HIRE', 'FOLLOW_UP', 'PENDING'],
+        default: 'PENDING',
+      },
+    },
     status: {
       type: String,
       enum: ['SCHEDULED', 'COMPLETED', 'CANCELLED', 'RESCHEDULED'],

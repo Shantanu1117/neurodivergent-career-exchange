@@ -231,22 +231,66 @@ export const PlacedCandidatesPage: React.FC = () => {
             See real candidates who discovered high-paying technology, QA, cybersecurity, and data roles aligned with their cognitive strengths, communication needs, and guaranteed accommodations.
           </p>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 max-w-4xl mx-auto pt-8">
-            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle">
-              <span className="block text-2xl sm:text-3xl font-black text-brand-600 dark:text-indigo-400">480+</span>
+          {/* Stats Grid with GSAP Counters & 3D Tilt */}
+          <div
+            data-gsap="stagger-parent"
+            className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 max-w-4xl mx-auto pt-8"
+          >
+            <div
+              data-gsap-item
+              data-gsap-tilt="6"
+              className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle will-change-transform"
+            >
+              <span
+                data-gsap-counter="480"
+                data-gsap-suffix="+"
+                className="block text-2xl sm:text-3xl font-black text-brand-600 dark:text-indigo-400"
+              >
+                480+
+              </span>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Verified Placements</span>
             </div>
-            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle">
-              <span className="block text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">94%</span>
+            <div
+              data-gsap-item
+              data-gsap-tilt="6"
+              className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle will-change-transform"
+            >
+              <span
+                data-gsap-counter="94"
+                data-gsap-suffix="%"
+                className="block text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400"
+              >
+                94%
+              </span>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">6-Month Retention Rate</span>
             </div>
-            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle">
-              <span className="block text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">$118k</span>
+            <div
+              data-gsap-item
+              data-gsap-tilt="6"
+              className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle will-change-transform"
+            >
+              <span
+                data-gsap-counter="118"
+                data-gsap-prefix="$"
+                data-gsap-suffix="k"
+                className="block text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400"
+              >
+                $118k
+              </span>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Average Placed Salary</span>
             </div>
-            <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle">
-              <span className="block text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400">100%</span>
+            <div
+              data-gsap-item
+              data-gsap-tilt="6"
+              className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle will-change-transform"
+            >
+              <span
+                data-gsap-counter="100"
+                data-gsap-suffix="%"
+                className="block text-2xl sm:text-3xl font-black text-purple-600 dark:text-purple-400"
+              >
+                100%
+              </span>
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Accommodated Workplaces</span>
             </div>
           </div>
@@ -346,11 +390,16 @@ export const PlacedCandidatesPage: React.FC = () => {
         </div>
 
         {/* Candidates Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          data-gsap="stagger-parent"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredCandidates.map((cand) => (
             <div
               key={cand.id}
-              className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-subtle hover:shadow-card dark:hover:border-slate-700 transition-all flex flex-col justify-between overflow-hidden group"
+              data-gsap-item
+              data-gsap-tilt="7"
+              className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-subtle hover:shadow-floating dark:hover:border-indigo-700 transition-colors flex flex-col justify-between overflow-hidden group will-change-transform"
             >
               <div>
                 {/* Top Banner with Avatar & Verified Badge */}

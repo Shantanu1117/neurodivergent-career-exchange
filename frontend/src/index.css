@@ -20,6 +20,36 @@
     font-size: 20px;
   }
 
+  /* WCAG 2.2 SC 1.4.12 Text Spacing & Dyslexia-Friendly Typography */
+  html.line-spacing-relaxed p,
+  html.line-spacing-relaxed li {
+    line-height: 1.75 !important;
+  }
+  html.line-spacing-loose p,
+  html.line-spacing-loose li {
+    line-height: 2.0 !important;
+  }
+  html.letter-spacing-wide body {
+    letter-spacing: 0.04em !important;
+    word-spacing: 0.1em !important;
+  }
+  html.dyslexia-font body {
+    font-family: 'Lexend', 'Comic Sans MS', 'Trebuchet MS', 'Verdana', system-ui, sans-serif !important;
+  }
+
+  /* Focus Mode (Distraction Reduction — W3C COGA) */
+  html.focus-mode-active footer {
+    display: none !important;
+  }
+  html.focus-mode-active aside {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+  html.focus-mode-active aside:hover,
+  html.focus-mode-active aside:focus-within {
+    opacity: 1;
+  }
+
   /* High Contrast Mode */
   html.high-contrast {
     filter: contrast(115%);
@@ -57,10 +87,17 @@
     gap: 0.75rem !important;
   }
 
-  /* Focus styling for keyboard accessibility */
+  /* WCAG 2.2 SC 2.4.13 Focus Appearance & 2.5.8 Target Size (Min 24x24px) */
   *:focus-visible {
-    outline: 2px solid #4f46e5;
+    outline: 3px solid #4f46e5;
     outline-offset: 2px;
+  }
+  button,
+  a,
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-height: 24px;
+    min-width: 24px;
   }
 
   /* Sensory-Friendly Night View / Dark Mode Base System */

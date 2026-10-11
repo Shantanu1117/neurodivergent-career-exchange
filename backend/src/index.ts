@@ -1,9 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, Router } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { Job } from './models/Job.js';
 import { seedDatabase } from './utils/seed.js';
+import { AdminController } from './controllers/adminController.js';
 
 // Route imports
 import authRoutes from './routes/authRoutes.js';
@@ -17,6 +18,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import resourceRoutes from './routes/resourceRoutes.js';
 import employerRoutes from './routes/employerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import emailRoutes from './routes/emailRoutes.js';
 
 dotenv.config();
 
@@ -29,38 +31,72 @@ if (PORT === 5000) {
   PORT = 5001;
 }
 
-// Security & Parsing Middleware
+// Multi-Origin CORS Support (Localhost + Configured Frontend + Vercel Deployments)
+const configuredOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      const normalized = origin.replace(/\/$/, '');
+      if (
+        configuredOrigins.includes(normalized) ||
+        normalized.startsWith('http://localhost:') ||
+        normalized.startsWith('http://127.0.0.1:') ||
+        normalized.endsWith('.vercel.app')
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health Check
-app.get('/api/health', (req: Request, res: Response) => {
+// Health Check Handler (accessible at /, /health, /api/health, and /api/v1/health)
+const healthHandler = (req: Request, res: Response) => {
   res.json({
     status: 'ONLINE',
     service: 'Neurodivergent Career Exchange API',
-    version: '1.0.0',
+    version: '2.0.0',
     timestamp: new Date().toISOString(),
   });
-});
+};
 
-// Mount API v1 Routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/candidates', candidateRoutes);
-app.use('/api/v1/assessments', assessmentRoutes);
-app.use('/api/v1/jobs', jobRoutes);
-app.use('/api/v1/applications', applicationRoutes);
-app.use('/api/v1/interviews', interviewRoutes);
-app.use('/api/v1/messages', messageRoutes);
-app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/resources', resourceRoutes);
-app.use('/api/v1/employers', employerRoutes);
-app.use('/api/v1/admin', adminRoutes);
+app.get('/', healthHandler);
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
+app.get('/api/v1/health', healthHandler);
+
+// Unified API Router mounted at /api/v1, /api, and root fallback to prevent 404s across any VITE_API_URL format
+const apiRouter = Router();
+apiRouter.get('/health', healthHandler);
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/candidates', candidateRoutes);
+apiRouter.use('/assessments', assessmentRoutes);
+apiRouter.use('/jobs', jobRoutes);
+apiRouter.use('/applications', applicationRoutes);
+apiRouter.use('/interviews', interviewRoutes);
+apiRouter.use('/messages', messageRoutes);
+apiRouter.use('/notifications', notificationRoutes);
+apiRouter.use('/resources', resourceRoutes);
+apiRouter.use('/employers', employerRoutes);
+apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/emails', emailRoutes);
+apiRouter.post('/feedback/accessibility', AdminController.createAccessibilityReport);
+
+app.use('/api/v1', apiRouter);
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Centralized Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

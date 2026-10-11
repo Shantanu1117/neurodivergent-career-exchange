@@ -5,6 +5,7 @@ import { EmployerProfile } from '../models/EmployerProfile.js';
 import { Job } from '../models/Job.js';
 import { Application } from '../models/Application.js';
 import { Interview } from '../models/Interview.js';
+import { AccessibilityReport } from '../models/AccessibilityReport.js';
 
 export class AdminController {
   public static async getStats(req: Request, res: Response): Promise<void> {
@@ -15,6 +16,7 @@ export class AdminController {
       const totalApplications = await Application.countDocuments();
       const totalInterviews = await Interview.countDocuments();
       const successfulOffers = await Application.countDocuments({ status: 'OFFER' });
+      const openAccessibilityReports = await AccessibilityReport.countDocuments({ status: 'OPEN' });
 
       // Breakdown by categories
       const categoryBreakdown = await Job.aggregate([
@@ -36,6 +38,7 @@ export class AdminController {
           totalApplications,
           totalInterviews,
           successfulOffers,
+          openAccessibilityReports,
           categoryBreakdown,
           applicationStatusBreakdown,
         },
@@ -43,6 +46,82 @@ export class AdminController {
     } catch (err: any) {
       console.error('admin getStats error:', err);
       res.status(500).json({ success: false, message: 'Failed to retrieve administrative statistics.' });
+    }
+  }
+
+  public static async createAccessibilityReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { pageUrl, category, severity, description, reporterEmail } = req.body;
+      if (!description || String(description).trim().length < 5) {
+        res.status(400).json({
+          success: false,
+          message: 'Please provide a brief description of the accessibility barrier.',
+        });
+        return;
+      }
+
+      const report = await AccessibilityReport.create({
+        pageUrl: pageUrl || '/',
+        category: category || 'COGNITIVE_CLARITY',
+        severity: severity || 'MEDIUM',
+        description: String(description).trim(),
+        reporterEmail: reporterEmail || '',
+        status: 'OPEN',
+      });
+
+      res.status(201).json({
+        success: true,
+        report,
+        message: 'Accessibility feedback submitted. Thank you for helping keep NCE barrier-free.',
+      });
+    } catch (err: any) {
+      console.error('createAccessibilityReport error:', err);
+      res.status(500).json({ success: false, message: 'Failed to submit accessibility report.' });
+    }
+  }
+
+  public static async getAccessibilityReports(req: Request, res: Response): Promise<void> {
+    try {
+      const reports = await AccessibilityReport.find().sort({ createdAt: -1 }).limit(100).lean();
+      res.json({ success: true, reports });
+    } catch (err: any) {
+      console.error('getAccessibilityReports error:', err);
+      res.status(500).json({ success: false, message: 'Failed to retrieve accessibility reports.' });
+    }
+  }
+
+  public static async updateAccessibilityReport(req: Request, res: Response): Promise<void> {
+    try {
+      const { status, adminNote } = req.body;
+      const report = await AccessibilityReport.findByIdAndUpdate(
+        req.params.id,
+        { $set: { status, adminNote } },
+        { new: true }
+      );
+      if (!report) {
+        res.status(404).json({ success: false, message: 'Accessibility report not found.' });
+        return;
+      }
+      res.json({ success: true, report });
+    } catch (err: any) {
+      console.error('updateAccessibilityReport error:', err);
+      res.status(500).json({ success: false, message: 'Failed to update accessibility report.' });
+    }
+  }
+
+  public static async toggleEmployerVerification(req: Request, res: Response): Promise<void> {
+    try {
+      const employer = await EmployerProfile.findById(req.params.id);
+      if (!employer) {
+        res.status(404).json({ success: false, message: 'Employer profile not found.' });
+        return;
+      }
+      employer.verified = !employer.verified;
+      await employer.save();
+      res.json({ success: true, employer });
+    } catch (err: any) {
+      console.error('toggleEmployerVerification error:', err);
+      res.status(500).json({ success: false, message: 'Failed to toggle employer verification.' });
     }
   }
 
@@ -87,13 +166,11 @@ export class AdminController {
       const user = await User.findById(id);
       if (!user) {
         res.status(404).json({ success: false, message: 'User not found.' });
-        return;
+      } else {
+        user.isActive = !user.isActive;
+        await user.save();
+        res.json({ success: true, user: { id: user._id, isActive: user.isActive } });
       }
-
-      user.isActive = !user.isActive;
-      await user.save();
-
-      res.json({ success: true, user: { id: user._id, isActive: user.isActive } });
     } catch (err: any) {
       console.error('toggleUserStatus error:', err);
       res.status(500).json({ success: false, message: 'Failed to toggle user status.' });

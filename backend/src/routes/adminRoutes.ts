@@ -11,5 +11,8 @@ router.get('/jobs', requireAuth, requireRole('ADMIN'), AdminController.getAllJob
 router.patch('/jobs/:id/status', requireAuth, requireRole('ADMIN'), AdminController.toggleJobStatus);
 router.delete('/jobs/:id', requireAuth, requireRole('ADMIN'), AdminController.deleteJob);
 router.get('/applications', requireAuth, requireRole('ADMIN'), AdminController.getAllApplications);
+router.get('/accessibility-reports', requireAuth, requireRole('ADMIN'), AdminController.getAccessibilityReports);
+router.patch('/accessibility-reports/:id', requireAuth, requireRole('ADMIN'), AdminController.updateAccessibilityReport);
+router.patch('/employers/:id/verify', requireAuth, requireRole('ADMIN'), AdminController.toggleEmployerVerification);
 
 export default router;

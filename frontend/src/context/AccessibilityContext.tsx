@@ -4,9 +4,14 @@ export interface AccessibilitySettings {
   theme: 'light' | 'dark';
   reducedMotion: boolean;
   fontSize: 'standard' | 'medium' | 'large';
+  lineSpacing: 'normal' | 'relaxed' | 'loose';
+  letterSpacing: 'normal' | 'wide';
+  dyslexiaFont: boolean;
+  focusMode: boolean;
   highContrast: boolean;
   density: 'comfortable' | 'compact';
   disableAnimations: boolean;
+  speechRate: number;
 }
 
 interface AccessibilityContextType {
@@ -21,15 +26,24 @@ interface AccessibilityContextType {
   isDrawerOpen: boolean;
   toggleDrawer: () => void;
   closeDrawer: () => void;
+  isSpeaking: boolean;
+  speakText: (text: string) => void;
+  stopSpeaking: () => void;
+  readCurrentPageAloud: () => void;
 }
 
 const DEFAULT_SETTINGS: AccessibilitySettings = {
   theme: 'light',
   reducedMotion: false,
   fontSize: 'standard',
+  lineSpacing: 'normal',
+  letterSpacing: 'normal',
+  dyslexiaFont: false,
+  focusMode: false,
   highContrast: false,
   density: 'comfortable',
   disableAnimations: false,
+  speechRate: 1.0,
 };
 
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
@@ -53,18 +67,18 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         return { ...DEFAULT_SETTINGS, theme: defaultTheme };
       }
     }
-    // Respect OS preference if present
-    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     return { ...DEFAULT_SETTINGS, theme: defaultTheme, reducedMotion: prefersReducedMotion };
   });
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('ndce_accessibility', JSON.stringify(settings));
     localStorage.setItem('ndce_theme', settings.theme);
 
-    // Apply classes to root HTML element
     const root = document.documentElement;
 
     // Dark mode class
@@ -77,6 +91,28 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     // Font size
     root.classList.remove('text-size-standard', 'text-size-medium', 'text-size-large');
     root.classList.add(`text-size-${settings.fontSize}`);
+
+    // Line spacing (WCAG 2.2 SC 1.4.12 Text Spacing)
+    root.classList.remove('line-spacing-normal', 'line-spacing-relaxed', 'line-spacing-loose');
+    root.classList.add(`line-spacing-${settings.lineSpacing || 'normal'}`);
+
+    // Letter spacing
+    root.classList.remove('letter-spacing-normal', 'letter-spacing-wide');
+    root.classList.add(`letter-spacing-${settings.letterSpacing || 'normal'}`);
+
+    // Dyslexia-friendly typography
+    if (settings.dyslexiaFont) {
+      root.classList.add('dyslexia-font');
+    } else {
+      root.classList.remove('dyslexia-font');
+    }
+
+    // Focus mode (distraction reduction)
+    if (settings.focusMode) {
+      root.classList.add('focus-mode-active');
+    } else {
+      root.classList.remove('focus-mode-active');
+    }
 
     // Contrast
     if (settings.highContrast) {
@@ -97,6 +133,34 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [settings]);
 
+  const speakText = (text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/\s+/g, ' ').trim().slice(0, 4000);
+    if (!cleanText) return;
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = settings.speechRate || 1.0;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  };
+
+  const readCurrentPageAloud = () => {
+    if (typeof document === 'undefined') return;
+    const mainEl = document.querySelector('main') || document.body;
+    const text = mainEl?.innerText || '';
+    speakText(text);
+  };
+
   const updateSetting = <K extends keyof AccessibilitySettings>(
     key: K,
     value: AccessibilitySettings[K]
@@ -112,6 +176,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const resetSettings = () => {
+    stopSpeaking();
     setSettings(DEFAULT_SETTINGS);
   };
 
@@ -129,6 +194,10 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         isDrawerOpen,
         toggleDrawer,
         closeDrawer,
+        isSpeaking,
+        speakText,
+        stopSpeaking,
+        readCurrentPageAloud,
       }}
     >
       {children}

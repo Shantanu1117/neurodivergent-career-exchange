@@ -14,7 +14,8 @@ router.get('/:id', optionalAuth, JobController.getJobById);
 // Candidate Actions
 router.post('/:id/save', requireAuth, requireRole('CANDIDATE'), JobController.toggleSaveJob);
 
-// Employer Actions
+// Employer Actions & Inclusivity Linter
+router.post('/analyze-inclusivity', optionalAuth, JobController.analyzeJobInclusivity);
 router.post('/', requireAuth, requireRole('EMPLOYER'), JobController.createJob);
 router.put('/:id', requireAuth, requireRole('EMPLOYER'), JobController.updateJob);
 router.patch('/:id/status', requireAuth, requireRole('EMPLOYER'), JobController.toggleStatus);

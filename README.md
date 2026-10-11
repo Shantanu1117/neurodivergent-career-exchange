@@ -1,4 +1,4 @@
-# Neurodivergent Career Exchange (NDCE)
+# Neurodivergent Career Exchange (NCE)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
@@ -6,9 +6,18 @@
 [![Node.js](https://img.shields.io/badge/Node.js-24-green.svg)](https://nodejs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8.svg)](https://tailwindcss.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248.svg)](https://mongoosejs.com/)
-[![WCAG 2.1](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA%2FAAA-emerald.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
+[![WCAG 2.2](https://img.shields.io/badge/Accessibility-WCAG%202.2%20AA%2FAAA%20%2B%20W3C%20COGA-emerald.svg)](https://www.w3.org/TR/WCAG22/)
 
-> **A Strengths-First, Sensory-Accessible Employment Platform connecting Autistic, ADHD, and Neurodivergent Professionals with Inclusive Employers.**
+> **A Strengths-First, Sensory-Accessible Employment Platform connecting Autistic, ADHD, Dyslexic, and Neurodivergent Professionals with Inclusive Employers.**
+
+---
+
+## 📚 Engineering & Product Documentation (`docs/`)
+
+- **[`docs/FEATURE_RESEARCH.md`](./docs/FEATURE_RESEARCH.md)** — Comprehensive research of **40 candidate features** across Categories A–F with authoritative citations (W3C WCAG 2.2, W3C COGA, Mentra, Inclusively, Specialisterne, and UK DWP Rapid Evidence Assessment).
+- **[`docs/IMPLEMENTATION_PLAN.md`](./docs/IMPLEMENTATION_PLAN.md)** — Repository architecture audit, **P0 Registration 404 Root-Cause Analysis**, and prioritized P0–P3 engineering roadmap.
+- **[`docs/FEATURES_IMPLEMENTED.md`](./docs/FEATURES_IMPLEMENTED.md)** — Complete implementation log mapping all **30 implemented production features** to modified files, Mongoose models, API routes, and React components.
+- **[`docs/TESTING_REPORT.md`](./docs/TESTING_REPORT.md)** — Build verification (`tsc` + `vite build`) and **18/18 automated end-to-end HTTP integration test results**.
 
 ---
 
@@ -16,220 +25,112 @@
 
 Traditional hiring processes rely on unstructured interviews, ambiguous social cues, high-stimulus assessment centers, and rigid workplace expectations. These systemic barriers lead to an estimated **30–40% chronic underemployment rate among neurodivergent adults**, despite exceptional cognitive capabilities in technical precision, pattern recognition, systematic verification, and deep problem-solving.
 
-**Neurodivergent Career Exchange (NDCE)** bridges this gap by shifting the paradigm from *deficit-based medical disclosure* to *strengths-first cognitive alignment*. 
-
-### Core Ethical Pillars
-1. **Zero Mandatory Medical Disclosure**: Candidates are never asked or required to disclose clinical diagnoses. Privacy is fully preserved.
-2. **Strengths-First Alignment**: Matching is calculated across 12 cognitive strengths and 6 specialized career disciplines.
-3. **Transparent & Explainable Matching**: No black-box AI scores. Every percentage match provides an itemized breakdown across 5 factors.
-4. **Predictable Interview Framework**: Ambush interviews and surprise questions are replaced with advance agendas, interviewer bios, and confirmed accommodations.
-5. **Living "How I Work Best" Canvas**: A structured communication profile setting clear expectations between candidate and hiring manager.
-6. **Sensory-Friendly Design System**: Persistent WCAG 2.1 AAA Accessibility Drawer featuring reduced motion, high-contrast borders, font scaling, and density toggles.
+**Neurodivergent Career Exchange (NCE)** bridges this gap by shifting the paradigm from *deficit-based medical disclosure* to *strengths-first cognitive alignment*.
 
 ---
 
-## 🏗 System Architecture
+## 🚀 30 Advanced Neuro-Inclusive Features Implemented
 
-```mermaid
-flowchart TD
-    subgraph Frontend["React 18 + TypeScript + Vite"]
-        UI[Tailwind CSS + Lucide React]
-        AccDrawer[Sensory Accessibility Drawer]
-        AuthCtx[Auth Context & JWT Store]
-        AppPages[Candidate, Employer & Admin Portals]
-        Recharts[Recharts Interactive Analytics]
-    end
+### Category A — Neuroinclusive Matching, Career Discovery & Smart Guidance
+1. **Multi-Dimensional Explainable Match Score Breakdown** (`Skills`, `Environment`, `Strengths`, `Experience`, `Accommodations`)
+2. **Cognitive Strengths Radar & 6-Track Career Assessment** (18 non-diagnostic questions)
+3. **Candidate-Controlled Matching Weight Sliders** (Live priority sliders on the job search page with profile persistence)
+4. **Skill-Gap Analysis & Actionable Learning Bridge** (`GET /api/v1/candidates/skill-gap/:jobId` on every Job Detail page)
+5. **Sensory & Cognitive Work-Style Compatibility Engine** (Auditory sensitivity, visual stimulation, social concurrency, context switching, predictability)
+6. **Interactive Career Pathway & Role Transition Explorer** (3-tier progressions from Entry-Level to Senior Specialist)
+7. **Non-Linear Experience & Transferable Skills Mapper** (Translates non-traditional projects & special interests into verified skills)
 
-    subgraph Backend["Node.js + Express + TypeScript"]
-        Router[REST API v1 Router]
-        AuthMW[JWT Verification & Role RBAC]
-        MatchEngine[Deterministic 5-Factor Matching Service]
-        AssessEngine[18-Question Cognitive Alignment Engine]
-    end
+### Category B — Low-Anxiety Candidate Onboarding, Profiling & Self-Advocacy
+8. **4-Step Chunked, Save-Anytime Onboarding Wizard**
+9. **Interactive "How I Work Best" Workplace Manual Builder**
+10. **Non-Diagnostic Needs-Based Accommodation Selector**
+11. **Smart CV/Portfolio Skill & Strength Extractor** (`POST /api/v1/candidates/parse-cv` — 1-click resume/portfolio parser)
+12. **Plain-Language Job Summaries & Essential ("Must-Have") vs. Bonus ("Nice-to-Have") Requirements Split** (W3C COGA standard)
+13. **Private Accommodation Planner ("Health Adjustment Passport")** (Stage-by-stage planner with 1-click portable JSON download)
 
-    subgraph Database["MongoDB Data Layer"]
-        Mongoose[Mongoose Models]
-        EmbeddedDB[(Embedded MongoMemoryServer Fallback)]
-        ExternalDB[(MongoDB Atlas / Enterprise 8.x)]
-    end
+### Category C — Inclusive Application, Interview & Assessment Workflows
+14. **Predictable Interview Process & Low-Anxiety Pre-Interview Readiness Checklist**
+15. **Structured Bias-Free Interview Rubric Scorecard** (4 objective skill dimensions replacing eye-contact/small-talk scoring)
+16. **Alternative Interview Modality Selector** (`WRITTEN_ASYNC`, `TAKE_HOME_TASK`, `VIDEO` camera-optional, `PHONE`, `FLEXIBLE`)
+17. **Work-Sample / Task-Based Assessment Engine** (Resume-alternative practical task prompts & artifact submission)
+18. **Granular Stage-Gate Disclosure Controls** (`APPLICATION`, `INTERVIEW`, `OFFER`, `POST_HIRE`, `NEVER`)
+19. **Time-Zone Aware Scheduling, Sensory Break Buffers (`+10m/+15m`) & `.ics` Calendar Invite Export**
+20. **Predictable 5-Stage Application Progress Stepper & Expected SLA Next-Step Guide**
+21. **Post-Application Constructive Feedback Loop** (1-click candidate feedback request + structured employer feedback modal)
 
-    UI --> AuthCtx
-    AuthCtx --> Router
-    AppPages --> Router
-    AccDrawer --> UI
-    Recharts --> AppPages
+### Category D — Employer Neuroinclusivity Toolkit & Bias Reduction
+22. **Live Neuroinclusive Job-Posting Quality Checker & Bias Linter** (`POST /api/v1/jobs/analyze-inclusivity` — flags ableist/exclusionary tropes and scores 0–100)
+23. **Employer Neuro-Inclusivity Verification Badge**
+24. **Employer Accommodation Readiness & Day-1 Checklist** (`PATCH /api/v1/applications/:id/checklist` — `PENDING -> APPROVED -> COMPLETED`)
+25. **Neuroinclusive Interview Question Bank Generator** (1-click literal question bank by career track)
+26. **Sensory & Cognitive Load Transparency Cards** (Noise level, meeting load, communication style, task structure)
+27. **Inclusive Hiring Funnel & Accommodation Demand Analytics**
 
-    Router --> AuthMW
-    AuthMW --> MatchEngine
-    AuthMW --> AssessEngine
-    MatchEngine --> Mongoose
-    AssessEngine --> Mongoose
-
-    Mongoose --> ExternalDB
-    Mongoose -.-> EmbeddedDB
-```
-
----
-
-## 🚀 Key Feature Highlights
-
-### 1. Candidate Experience
-- **Interactive Career Fit Assessment**: 18 carefully constructed work-style and cognitive preference questions across 6 tracks (Software Testing / QA, Cybersecurity, Data Analysis / Audit, Software Engineering, UI/UX, Documentation).
-- **Transparent Results Hub**: Interactive comparison bars showing alignment across all 6 tracks with clear, non-diagnostic rationales.
-- **Explainable Job Matching**: Every job listing features a dynamic match percentage and a modal explaining the breakdown across:
-  - Skills Overlap (30%)
-  - Work Environment Fit (25%)
-  - Cognitive Strengths Alignment (20%)
-  - Experience Level Match (15%)
-  - Guaranteed Accommodations Fit (10%)
-- **Living "How I Work Best" Canvas**: Custom workspace canvas defining optimal communication style, meeting cadence, focus blocks, and requested accommodations.
-- **Dual-View ATS Application Tracker**: Kanban board and list view allowing candidates to track application stages (`Applied` ➔ `Screening` ➔ `Interviewing` ➔ `Offer Extended`).
-- **Predictable Interview Hub**: Structured interview cards detailing the meeting agenda, confirmed accommodations, interviewer bios, and prep questions in advance.
-
-### 2. Employer & Recruiter Experience
-- **Inclusive Job Posting Creator**: Define role essentials, salary transparency, target cognitive traits, and guaranteed inclusive workplace accommodations.
-- **Candidate Discovery**: Search candidate profiles by cognitive strengths, communication preferences, and work modes while respecting privacy controls.
-- **Pipeline Stage Mover**: Review applicants with match percentages, add private recruiter notes, and transition applicants through ATS stages.
-- **Predictable Interview Scheduler**: Create interview invites with mandatory agendas, interviewer bios, and preparation questions.
-
-### 3. Administrative Operations
-- **Executive KPI Dashboard**: Macro view of total candidates, partner companies, active postings, and placement rates.
-- **Platform Analytics (Recharts)**: Interactive charts analyzing job distribution across cognitive disciplines and pipeline conversion rates.
-- **Job Moderation**: Audit job postings for neuro-inclusive standards with one-click publish, unpublish, and archive controls.
-- **Application Oversight**: Real-time audit trail of all candidate submissions across the platform.
-- **Knowledge Base CMS**: Author and manage sensory work guides, interview playbooks, and accommodation toolkits.
-- **System Health Monitor**: Live telemetry for database engines, JWT encryption, and matching service latency.
+### Category E & F — Sensory Comfort, WCAG 2.2 Accessibility & Data Sovereignty
+28. **Multi-Axis Sensory & Typography Comfort Drawer (WCAG 2.2 SC 1.4.12)** (Light/Dark theme, Font Size, Line Spacing, Letter Spacing, Dyslexia Font, High Contrast, Reduced Motion)
+29. **Integrated Text-to-Speech (TTS) Read-Aloud Assistant** (Zero-dependency Web Speech API reader with `0.85x / 1.0x / 1.15x` rate control)
+30. **Accessible Authentication (WCAG 2.2 SC 3.3.8), Distraction-Free Focus Mode, GDPR Portable Data Export (`GET /api/v1/candidates/export-data`), Cascade Account Deletion (`DELETE /api/v1/candidates/account`), & In-App Accessibility Barrier Reporter (`POST /api/v1/feedback/accessibility`)**
 
 ---
 
-## 🛠 Tech Stack
-
-| Domain | Technologies |
-| :--- | :--- |
-| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Lucide React, Recharts, React Router v6 |
-| **Backend** | Node.js (v20+ / v24), Express, TypeScript, Mongoose ODM, JWT, bcrypt |
-| **Database** | MongoDB with automatic fallback to high-performance embedded `mongodb-memory-server` |
-| **Accessibility** | WCAG 2.1 AA/AAA Sensory Compliance, Persistent Accessibility Drawer |
-| **Architecture** | Clean Layered MVC, Explainable Deterministic Matching Algorithm |
-
----
-
-## 🔑 Demo Accounts (Pre-Seeded)
-
-The database automatically seeds with realistic enterprise demo data on initial startup:
+## 🔑 Pre-Seeded Demo Accounts
 
 | Role | Email Address | Password | Profile Highlights |
 | :--- | :--- | :--- | :--- |
 | **Candidate** | `candidate@demo.com` | `Demo@2026!` | Jordan Taylor (QA Automation Engineer, 96% QA / Data fit) |
 | **Employer** | `employer@demo.com` | `Demo@2026!` | NeuroTech Labs (Verified Inclusive Employer, 4 active jobs) |
-| **Admin** | `admin@demo.com` | `Demo@2026!` | System SuperAdmin (Full moderation & analytics oversight) |
-
-> 💡 **Quick Login:** The Login screen features 1-click **Demo Login** buttons for instant role switching during presentations and portfolio reviews.
+| **Admin** | `admin@demo.com` | `Demo@2026!` | System SuperAdmin (Full moderation, analytics & WCAG report triage) |
 
 ---
 
-## 💻 Quick Start & Local Setup
+## 💻 Local Development Setup
 
-### 1. Prerequisites
-- [Node.js](https://nodejs.org/) v20.x or higher
-- npm v10.x or higher
-
-### 2. Installation
-Clone the repository and install all dependencies:
+### 1. Install Dependencies
 ```bash
-git clone https://github.com/your-username/neurodivergent-career-exchange.git
-cd neurodivergent-career-exchange
-
-# Install backend and frontend dependencies
-npm run install:all
+# Install root, backend, and frontend dependencies
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-### 3. Running the Development Servers
-Open two terminal windows (or run in background):
-
-**Terminal 1 — Backend:**
+### 2. Run Backend & Frontend Dev Servers
+**Terminal 1 — Backend (`http://localhost:5001`):**
 ```bash
-npm run dev:backend
+cd backend
+npm run dev
 ```
-*The backend connects to `MONGODB_URI` if provided in `backend/.env`, or automatically launches an embedded in-memory MongoDB instance with pre-seeded demo data on `http://localhost:5001`.*
+*Connects to `MONGODB_URI` if set, or automatically launches an embedded in-memory MongoDB instance with pre-seeded enterprise demo data on port `5001`.*
 
-**Terminal 2 — Frontend:**
+**Terminal 2 — Frontend (`http://localhost:5173`):**
 ```bash
-npm run dev:frontend
+cd frontend
+npm run dev
 ```
-*The Vite dev server starts on `http://localhost:5173` with automatic API proxying to `http://localhost:5001`.*
-
-### 4. Production Build
-```bash
-# Build both frontend and backend
-npm run build:backend
-npm run build:frontend
-```
+*Vite proxies `/api` requests automatically to `http://localhost:5001`.*
 
 ---
 
-## 📡 REST API Reference Summary
+## 🌐 Production Deployment Guide (Vercel + Render)
 
-### Authentication (`/api/v1/auth`)
-- `POST /register`: Register candidate or employer account.
-- `POST /login`: Authenticate and issue JWT.
-- `GET /me`: Fetch authenticated session user and profile.
-- `POST /logout`: Invalidate session.
+### 1. Backend Deployment (Render)
+- **Root Directory:** `backend`
+- **Build Command:** `npm install && npm run build`
+- **Start Command:** `npm start`
+- **Environment Variables:**
+  - `PORT`: `5001` (or Render default `10000`)
+  - `JWT_SECRET`: `<your-production-jwt-secret>`
+  - `MONGODB_URI`: `<your-mongodb-atlas-connection-string>` (optional; falls back to embedded in-memory MongoDB if omitted)
+  - `FRONTEND_URL`: `https://neurodivergent-career-exchange.vercel.app`
 
-### Candidates (`/api/v1/candidates`)
-- `GET /profile`: Get candidate profile & "How I Work Best" canvas.
-- `PUT /profile`: Update profile, strengths, and accommodations.
-- `GET /search`: Search candidate directory (Employer only).
-- `GET /:id`: View candidate profile details.
+> **Routing Resilience:** The backend mounts its API router at `/api/v1`, `/api`, and `/` simultaneously, and exposes health checks at `/`, `/health`, `/api/health`, and `/api/v1/health`.
 
-### Assessments (`/api/v1/assessments`)
-- `GET /questions`: Retrieve 18 assessment questions across 6 disciplines.
-- `POST /submit`: Score candidate responses and record alignment.
-- `GET /my-results`: Fetch candidate's cognitive match percentages.
-
-### Jobs (`/api/v1/jobs`)
-- `GET /`: Search and filter jobs with personalized candidate matching.
-- `GET /:id`: Fetch single job details and accommodation commitments.
-- `POST /`: Create new job posting (Employer only).
-- `PUT /:id`: Update existing job posting (Employer only).
-- `PATCH /:id/status`: Toggle job publish status (`PUBLISHED`, `CLOSED`, `DRAFT`).
-- `DELETE /:id`: Remove job posting.
-- `POST /:id/save`: Toggle saved job bookmark.
-- `GET /candidate/saved`: Retrieve bookmarked jobs.
-
-### Applications & ATS (`/api/v1/applications`)
-- `POST /`: Submit job application with requested accommodations.
-- `GET /my-applications`: Get candidate's applications with pipeline stages.
-- `GET /job-applications`: Review applicants for employer's postings.
-- `PATCH /:id/status`: Update applicant stage (`APPLIED`, `SCREENING`, `INTERVIEWING`, `OFFER`, `REJECTED`).
-- `POST /:id/notes`: Add private recruiter notes.
-- `POST /:id/withdraw`: Candidate withdraws application.
-
-### Interviews (`/api/v1/interviews`)
-- `POST /`: Schedule structured interview with agenda & prep questions.
-- `GET /my-interviews`: Fetch scheduled interviews.
-- `PATCH /:id/status`: Update interview status.
-
-### Admin Operations (`/api/v1/admin`)
-- `GET /stats`: Retrieve macro platform statistics and category distributions.
-- `GET /users`: List and search all platform users.
-- `PATCH /users/:id/status`: Toggle user active/suspended state.
-- `GET /jobs`: Retrieve and moderate platform job postings.
-- `PATCH /jobs/:id/status`: Moderate job visibility.
-- `DELETE /jobs/:id`: Remove job posting.
-- `GET /applications`: System-wide audit log of all candidate submissions.
-
----
-
-## 🎨 Sensory-Friendly & Ethical Design Principles
-
-- **WCAG 2.1 AAA Contrast:** All text meets high-contrast readability ratios.
-- **Predictable Interactions:** Forms provide real-time validation, clear feedback, and no abrupt auto-advances.
-- **Reduced Motion:** Configurable reduced motion turns off high-velocity transforms and jarring transitions.
-- **Calm Color Palette:** Calming slate, teal, and indigo tones reduce visual fatigue and overstimulation.
-- **Persistent Accessibility Drawer:** Accessible from any page via the top navigation bar or quick settings.
+### 2. Frontend Deployment (Vercel)
+- **Root Directory:** `frontend` (Both `/` and `/frontend` include `vercel.json` with SPA rewrite rules `/(.*) -> /index.html` so direct links to `/register`, `/login`, and `/jobs/:id` never return 404).
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+- **Environment Variables:**
+  - `VITE_API_URL`: `https://<your-render-backend>.onrender.com/api/v1` (Note: `resolveApiBaseUrl()` in `frontend/src/services/api.ts` automatically normalizes any URL format, whether it ends in `/`, `/api`, or `/api/v1`).
 
 ---
 
 ## 📄 License
-MIT License. Created for inclusive hiring advancement and portfolio demonstration.
+MIT License. Built for neuro-inclusive career advancement.

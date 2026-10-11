@@ -20,12 +20,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   onAction,
 }) => {
   return (
-    <div className="text-center py-12 px-4 bg-white rounded-2xl border border-slate-200/80 shadow-subtle max-w-lg mx-auto">
-      <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto mb-4">
+    <div className="text-center py-12 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-subtle max-w-lg mx-auto">
+      <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 flex items-center justify-center mx-auto mb-4">
         <Icon className="w-6 h-6" />
       </div>
-      <h3 className="text-base font-bold text-slate-900 mb-1">{title}</h3>
-      <p className="text-xs text-slate-500 mb-6 leading-relaxed max-w-sm mx-auto">{description}</p>
+      <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">{title}</h3>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed max-w-sm mx-auto">
+        {description}
+      </p>
       {actionText && actionPath && (
         <Link
           to={actionPath}
